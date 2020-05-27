@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var sr = require('scrollreveal').default();
+var sr = process.client && require('scrollreveal').default();
 
 function generateOptions(defaultOptions, bindingValue, bindingModifiers) {
   var options = _extends({}, defaultOptions, bindingValue);
@@ -39,36 +39,38 @@ var VueScrollReveal = {
           delete options.class;
         }
 
-        sr.reveal(el, options);
+        process.client && sr.reveal(el, options);
       },
       update: function update(el, binding) {
         if (binding.value != binding.oldValue) {
           var options = generateOptions(defaultOptions, binding.value, binding.modifiers);
 
-          sr.reveal(el, options);
+          process.client && sr.reveal(el, options);
         }
       }
     });
 
     var $sr = {
       isSupported: function isSupported() {
-        return sr.isSupported();
+        return process.client && sr.isSupported();
       },
       sync: function sync() {
-        sr.sync();
+        process.client && sr.sync();
       },
       reveal: function reveal(target, config, interval, sync) {
+        if (!process.client) return;
         var options = generateOptions(defaultOptions, config);
 
         sr.reveal(target, config, interval, sync);
       }
     };
-
-    Object.defineProperty(Vue.prototype, '$sr', {
-      get: function get() {
-        return $sr;
-      }
-    });
+    if (process.client) {
+      Object.defineProperty(Vue.prototype, '$sr', {
+        get: function get() {
+          return $sr;
+        }
+      });
+    }
   }
 };
 
